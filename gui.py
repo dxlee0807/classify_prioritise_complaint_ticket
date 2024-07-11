@@ -5,6 +5,7 @@
 # import packages
 import os
 from pickle import load
+import datetime
 import pandas as pd
 import json
 import numpy as np
@@ -111,37 +112,6 @@ def preprocess_text(text):
     preprocessed_text = further_clean(lemmas)
     return preprocessed_text
 
-# try using generative AI to generate some (3-5) financial complaint tickets
-complaint_1 = """Unauthorized Charges on Credit Card
-Customer Name: John Doe
-Account Number: 1234 5678 9012 3456
-Complaint Type: Fraudulent Charges
-Description:
-I recently noticed several unauthorized charges on my credit card account. The charges were made at various merchants and totaled $500. I did not make these charges and suspect my card may have been compromised. I would like the charges reversed and a new card issued immediately. Please investigate this matter and provide a resolution as soon as possible. I can be reached at 555-1234 or john.doe@email.com if you need any additional information."""
-complaint_2 = """Mortgage Loan Modification Denial
-Customer Name: Jane Smith
-Loan Number: 98765-4321
-Complaint Type: Loan Modification Denial
-Description:
-I am writing to appeal the denial of my mortgage loan modification request. I have been making reduced payments for the past 6 months due to a job loss, but have now secured a new position. However, my mortgage payments are still unaffordable. I believe I qualify for a modification under the terms of my loan agreement. Please review my file again and provide a decision within 30 days. I can provide additional income documentation if needed. I can be reached at 555-5678 or jane.smith@email.com."""
-complaint_3 = """Debt Collection Harassment
-Customer Name: Michael Johnson
-Complaint Type: Debt Collection Harassment
-Description:
-I am being harassed by a debt collector regarding an old credit card debt. They have been calling me multiple times per day at home and work, despite me requesting they only contact me in writing. The calls are abusive and threatening. I have sent them a cease and desist letter, but the harassment continues. I would like this matter escalated to your legal department immediately. My attorney will be in touch if the calls do not stop. I can be reached at 555-9012 or michael.johnson@email.com."""
-complaint_4 = """Unauthorized Bank Account Closure
-Customer Name: Sarah Davis
-Account Number: 54321-09876
-Complaint Type: Unauthorized Account Closure
-Description:
-I visited my local bank branch today to make a deposit and was informed my checking account had been closed. No prior notice was provided. I rely on this account for my direct deposit paycheck and automatic bill payments. The branch manager was unable to reopen the account. I would like the account reinstated immediately with any related fees waived. Please investigate this matter and provide a resolution within 10 business days. I can be reached at 555-3456 or sarah.davis@email.com."""
-complaint_5 = """Inaccurate Credit Report
-Customer Name: David Wilson
-Complaint Type: Inaccurate Credit Report
-Description:
-I recently obtained my credit report and noticed several inaccuracies. There are two credit card accounts listed that do not belong to me, along with a fraudulent mortgage inquiry. I have disputed this information directly with the credit bureaus, but the errors remain on my report. I would like these items removed immediately as they are negatively impacting my credit score. Please investigate this matter and provide a written response within 30 days. I can be reached at 555-7890 or david.wilson@email.com."""
-
-
 # preprocess the description
 # - nlp, clean, tfidf
 # - model.predict() to get ticket category, and priority
@@ -153,14 +123,14 @@ def get_ticket_category_and_priority(text, topic_df, vectorizer, classifier):
     priority = pred[1]
     return category, priority
 
-complaints = [complaint_1,complaint_2,complaint_3,complaint_4,complaint_5]
+# complaints = [complaint_1,complaint_2,complaint_3,complaint_4,complaint_5]
 
-for c in complaints:
-   print(get_ticket_category_and_priority(c, topic_df, vectorizer, clf))
+# for c in complaints:
+#    print(get_ticket_category_and_priority(c, topic_df, vectorizer, clf))
 
 # Financial Domain Complaint Ticketing System
-st.set_page_config(page_title="Support tickets", page_icon="🎫")
-st.title("🎫 Support tickets")
+st.set_page_config(page_title="Financial Domain Complaint Ticketing System", page_icon="🎫")
+st.title("🎫 Financial Domain Complaint Ticketing System")
 st.write(
     """
     This app shows how you can build an internal tool in Streamlit. Here, we are 
@@ -169,22 +139,89 @@ st.write(
     """
 )
 
+# Create a Pandas dataframe to store tickets.
+if "ticket_df" not in st.session_state:
+   data = {
+      "ID": [], # TICKET-{id_in_int}
+      "Title":[],
+      "Status":[],
+      "Description":[],
+      "Category":[],
+      "Priority":[],
+      "Date Submitted":[]
+   }
+   ticket_df = pd.DataFrame(data)
+   # Save the dataframe in session state (a dictionary-like object that persists across
+   # page runs). This ensures our data is persisted when the app updates.
+   st.session_state.ticket_df = ticket_df
+
 # Show a section to add a new ticket.
 st.header("Add a ticket")
 
 # We're adding tickets via an `st.form` and some input widgets. If widgets are used
 # in a form, the app will only rerun once the submit button is pressed.
 with st.form("add_ticket_form"):
+    title = st.text_input("Title")
     issue = st.text_area("Describe the issue") # enter description [long_text]
     submitted = st.form_submit_button("Submit")
 
 if submitted:
-   category,priority = get_ticket_category_and_priority(c, topic_df, vectorizer, clf)
-   # df add new row
-
+   # Make a dataframe for the new ticket and append it to the dataframe in session state.
+    # if int_x == 0 then recent_ticket_number
+    try:
+       recent_ticket_number = int(max(st.session_state.ticket_df.ID).split("-")[1])
+    except ValueError:
+       recent_ticket_number = 0
+    category,priority = get_ticket_category_and_priority(issue, topic_df, vectorizer, clf)
+    today = datetime.datetime.now().strftime("%Y-%d-%m, %H:%M:%S")
+    # df add new row at the top of current ticket_df
+    df_new = pd.DataFrame(
+       [
+          {
+            "ID": f"TICKET-{recent_ticket_number+1}", # TICKET-{id_in_int}
+            "Title":title,
+            "Status":"Open",
+            "Description":issue,
+            "Category":category,
+            "Priority":priority,
+            "Date Submitted":today
+          }
+       ]
+    )
+    # Show a little success message.
+    # show a box rather than df
+    st.write("Ticket submitted! Here are the ticket details:")
+    st.dataframe(df_new, use_container_width=True, hide_index=True)
+    st.session_state.ticket_df = pd.concat([df_new, st.session_state.ticket_df], axis=0)
 
 # can select which support user/team
 # table (sortable and filterable)
-# Description | Category | Priority | Resolve (tick to clear)
+# Description | Category | Priority | Status (tick to clear)
 
+# Show section to view and edit existing tickets in a table.
+st.header("Existing tickets")
+st.write(f"Number of tickets: `{len(st.session_state.ticket_df)}`")
 
+st.info(
+    "You can edit the tickets by double clicking on a cell. Note how the plots below "
+    "update automatically! You can also sort the table by clicking on the column headers.",
+    icon="✍️",
+)
+
+# Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
+# cells. The edited data is returned as a new dataframe.
+edited_df = st.data_editor(
+    st.session_state.ticket_df,
+    use_container_width=True,
+    hide_index=True,
+    column_config={
+        "Status": st.column_config.SelectboxColumn(
+            "Status",
+            help="Ticket status",
+            options=["Open", "In Progress", "Closed"],
+            required=True,
+        )
+    },
+    # Disable editing the ID and Date Submitted columns.
+    disabled=["ID", "Title","Description","Category", "Priority","Date Submitted"],
+)
