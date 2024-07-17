@@ -15,8 +15,8 @@ from streamlit import session_state as ss
 
 # overwrite the current DataFrame with live-updated ticket status 
 def save_edits():
-    if st.ss.edited_ticket_df.shape[0]>0 :
-        st.ss.ticket_df = st.ss.edited_ticket_df.copy()
+    if ss.edited_ticket_df.shape[0]>0 :
+        ss.ticket_df = ss.edited_ticket_df.copy()
 
 def submit_ticket_page(topic_df, vectorizer, classifier):
     # Show a section to add a new ticket.
@@ -32,7 +32,7 @@ def submit_ticket_page(topic_df, vectorizer, classifier):
     if submitted:
       # Make a dataframe for the new ticket and append it to the dataframe in session state.
         try:
-          recent_ticket_number = int(max(st.ss.ticket_df.ID).split("-")[1])
+          recent_ticket_number = int(max(ss.ticket_df.ID).split("-")[1])
         except ValueError:
           recent_ticket_number = 0
         category,priority = get_ticket_category_and_priority(issue, topic_df, vectorizer, classifier)
@@ -54,14 +54,14 @@ def submit_ticket_page(topic_df, vectorizer, classifier):
         # Show a little success message.
         st.write("Ticket submitted! Here are the ticket details:")
         st.table(df_new.astype(str).rename(index={0:'Information'}).T) # , use_container_width=True, hide_index=True
-        st.ss.ticket_df = pd.concat([df_new, st.ss.ticket_df], axis=0)
+        ss.ticket_df = pd.concat([df_new, ss.ticket_df], axis=0)
     return
 
 def view_all_tickets_page():
-    st.ss.ticket_df = st.ss.ticket_df.copy()
+    ss.ticket_df = ss.ticket_df.copy()
     # Show section to view and edit existing tickets in a table.
     st.header("Existing tickets")
-    st.write(f"Number of tickets: `{len(st.ss.ticket_df)}`")
+    st.write(f"Number of tickets: `{len(ss.ticket_df)}`")
 
     st.info(
         "You can edit the tickets by double clicking on a cell. Note how the plots below "
@@ -71,8 +71,8 @@ def view_all_tickets_page():
 
     # Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
     # cells. The edited data is returned as a new dataframe.
-    st.ss.edited_ticket_df = st.data_editor(
-        st.ss.ticket_df,
+    ss.edited_ticket_df = st.data_editor(
+        ss.ticket_df,
         use_container_width=True,
         hide_index=True,
         column_config={
@@ -88,7 +88,7 @@ def view_all_tickets_page():
         on_change = save_edits
     )
     st.write("edited_ticket_df")
-    st.dataframe(st.ss.edited_ticket_df)
+    st.dataframe(ss.edited_ticket_df)
     return
 
 def ticket_dashboard_page():
@@ -99,22 +99,22 @@ def ticket_dashboard_page():
     col1, col2, col3 = st.columns(3)
     col1.metric(
        label="Number of OPEN tickets", 
-       value=len(st.ss.ticket_df[st.ss.ticket_df.Status == "Open"])
+       value=len(ss.ticket_df[ss.ticket_df.Status == "Open"])
        )
     col2.metric(
        label="Number of IN PROGRESS tickets", 
-       value=len(st.ss.ticket_df[st.ss.ticket_df.Status == "In Progress"])
+       value=len(ss.ticket_df[ss.ticket_df.Status == "In Progress"])
        )
     col3.metric(
        label="Number of CLOSED tickets", 
-       value=len(st.ss.ticket_df[st.ss.ticket_df.Status == "Closed"])
+       value=len(ss.ticket_df[ss.ticket_df.Status == "Closed"])
        )
 
     # Show two Altair charts using `st.altair_chart`.
     st.write("")
     st.write("##### Ticket status per month")
     status_plot = (
-        alt.Chart(st.ss.edited_ticket_df)
+        alt.Chart(ss.edited_ticket_df)
         .mark_bar()
         .encode(
             x="month(Date Submitted):O",
@@ -130,7 +130,7 @@ def ticket_dashboard_page():
 
     st.write("##### Current ticket priorities")
     priority_plot = (
-        alt.Chart(st.ss.edited_ticket_df)
+        alt.Chart(ss.edited_ticket_df)
         .mark_arc()
         .encode(theta="count():Q", color="Priority:N")
         .properties(height=300)
@@ -142,7 +142,7 @@ def ticket_dashboard_page():
 
     st.write("##### Ticket category per month")
     status_plot = (
-        alt.Chart(st.ss.edited_ticket_df)
+        alt.Chart(ss.edited_ticket_df)
         .mark_bar()
         .encode(
             x="month(Date Submitted):O",
@@ -171,9 +171,9 @@ def main():
         """
     )
 
-    if "ticket_df" not in st.ss:
+    if "ticket_df" not in ss:
         # Create a Pandas dataframe to store tickets.
-        st.ss.ticket_df = pd.DataFrame({
+        ss.ticket_df = pd.DataFrame({
             "ID": [], # TICKET-{id_in_int}
             "Title":[],
             "Status":[],
@@ -182,7 +182,7 @@ def main():
             "Priority":[],
             "Date Submitted":[]
         })
-        st.ss.edited_ticket_df = st.ss.ticket_df.copy()
+        ss.edited_ticket_df = ss.ticket_df.copy()
 
     # Sidebar to select page and commit changes upon selection
     page = st.sidebar.selectbox("Select: ", ("Submit a Ticket","View all Tickets", "Ticket Dashboard"), on_change=save_edits) # , on_change=save_edits
