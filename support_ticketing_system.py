@@ -15,9 +15,13 @@ from streamlit import session_state as ss
 
 # overwrite the current DataFrame with live-updated ticket status 
 def save_edits():
-    # concat, drop duplicate, sort by id desc
+    # concatenating the ticket_df and edited_ticket_df merges the changes on the edited_ticket_df on ticket_df
+    # this will result in duplicated ticket IDs with different ticket status
+    # the concat_df will contains all records from ticket_df, then all records from edited_ticket_df
     concat_df = pd.concat([ss.ticket_df,ss.edited_ticket_df.copy()],axis=0)
+    # if duplicated Ticket ID exists for a ticket, then the ticket_status in the edited_ticket_df will be kept
     concat_df.drop_duplicates(subset='ID',keep='last',ignore_index=True,inplace=True)
+    # updating both ticket_df and edited_ticket_df with the concat_df with merged changes
     ss.ticket_df = concat_df
     ss.edited_ticket_df = concat_df
 
@@ -195,10 +199,6 @@ def main():
     elif page == "View all Tickets":
         view_all_tickets_page()
         ticket_dashboard_page()
-    # elif page == "Ticket Dashboard":
-        
-    
-    
-
+     
 if __name__ == "__main__":
    main()
