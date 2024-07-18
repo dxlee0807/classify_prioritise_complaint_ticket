@@ -24,7 +24,7 @@ import wordninja
 
 def load_files():
     # load topic_csv
-    topic_df = pd.read_csv("lda_topic.csv")
+    topic_df = pd.read_csv("ticket_category.csv")
 
     # load tfidf_vectorizer
     with open(os.path.join(os.getcwd(),'ml_models',"vectorizer.pkl"), "rb") as f:
