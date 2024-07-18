@@ -15,8 +15,11 @@ from streamlit import session_state as ss
 
 # overwrite the current DataFrame with live-updated ticket status 
 def save_edits():
-    if ss.edited_ticket_df.shape[0]>0 :
-        ss.ticket_df = ss.edited_ticket_df.copy()
+    # concat, drop duplicate, sort by id desc
+    concat_df = pd.concat([ss.ticket_df,ss.edited_ticket_df.copy()],axis=0)
+    concat_df.drop_duplicates(subset='ID',keep='last',ignore_index=True,inplace=True)
+    ss.ticket_df = concat_df
+    ss.edited_ticket_df = concat_df
 
 def submit_ticket_page(topic_df, vectorizer, classifier):
     # Show a section to add a new ticket.
@@ -99,15 +102,15 @@ def ticket_dashboard_page():
     col1, col2, col3 = st.columns(3)
     col1.metric(
        label="Number of OPEN tickets", 
-       value=len(ss.ticket_df[ss.ticket_df.Status == "Open"])
+       value=len(ss.edited_ticket_df[ss.edited_ticket_df.Status == "Open"])
        )
     col2.metric(
        label="Number of IN PROGRESS tickets", 
-       value=len(ss.ticket_df[ss.ticket_df.Status == "In Progress"])
+       value=len(ss.edited_ticket_df[ss.edited_ticket_df.Status == "In Progress"])
        )
     col3.metric(
        label="Number of CLOSED tickets", 
-       value=len(ss.ticket_df[ss.ticket_df.Status == "Closed"])
+       value=len(ss.edited_ticket_df[ss.edited_ticket_df.Status == "Closed"])
        )
 
     # Show two Altair charts using `st.altair_chart`.
@@ -142,7 +145,7 @@ def ticket_dashboard_page():
 
     st.write("##### Ticket category per month")
     status_plot = (
-        alt.Chart(ss.edited_ticket_df)
+        alt.Chart(ss.ticket_df)
         .mark_bar()
         .encode(
             x="month(Date Submitted):O",
@@ -185,14 +188,15 @@ def main():
         ss.edited_ticket_df = ss.ticket_df.copy()
 
     # Sidebar to select page and commit changes upon selection
-    page = st.sidebar.selectbox("Select: ", ("Submit a Ticket","View all Tickets", "Ticket Dashboard"), on_change=save_edits) # , on_change=save_edits
+    page = st.sidebar.selectbox("Select: ", ("Submit a Ticket","View all Tickets"), on_change=save_edits) # , on_change=save_edits
 
     if page == "Submit a Ticket":
         submit_ticket_page(topic_df, vectorizer, classifier)
     elif page == "View all Tickets":
         view_all_tickets_page()
-    elif page == "Ticket Dashboard":
         ticket_dashboard_page()
+    # elif page == "Ticket Dashboard":
+        
     
     
 
