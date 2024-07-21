@@ -94,8 +94,6 @@ def view_all_tickets_page():
         disabled=["ID", "Title","Description","Category", "Priority","Date Submitted"],
         on_change = save_edits
     )
-    st.write("edited_ticket_df")
-    st.dataframe(ss.edited_ticket_df)
     return
 
 def ticket_dashboard_page():
@@ -172,9 +170,13 @@ def main():
     st.title("🎫 Financial Domain Complaint Ticketing System")
     st.write(
         """
-        This app shows how you can build an internal tool in Streamlit. Here, we are 
-        implementing a support ticket workflow. The user can create a ticket, edit 
-        existing tickets, and view some statistics.
+        This application implements a support ticket workflow. The user can create a ticket, edit 
+        existing tickets, and view some statistics.\n
+        There are two pages in this application, 'Submit a Ticket', and 'View all Tickets'.\n
+        Under the 'Submit a Ticket' page, to create a ticket, the user can input the issue title, describe the issue, then click submit to create a ticket.
+        After the ticket is successfully created, the ticket category and priority is automatically determined by the pre-trained machine learning model.\n
+        Under the 'View all Tickets' page, the user can view all exisiting support tickets, and edit the ticket status. 
+        Besides, the user can view basic statistics such as number of tickets according to ticket status, ticket status per month, ticket priority, and ticket category per month.
         """
     )
 

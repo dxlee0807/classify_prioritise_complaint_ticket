@@ -31,7 +31,7 @@ def load_files():
         vectorizer = load(f)
 
     # load tuned_lr.pkl
-    with open(os.path.join(os.getcwd(),'ml_models',"tuned_lr.pkl"), "rb") as f:
+    with open(os.path.join(os.getcwd(),'ml_models',"lr_20240721_1.pkl"), "rb") as f:
         classifier = load(f)
 
     return topic_df, vectorizer, classifier
