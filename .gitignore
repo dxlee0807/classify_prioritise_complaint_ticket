@@ -1,3 +1,6 @@
 complaints-2021-05-14_08_16_.json
-topic_models*/
-ml_models*/
+topic_models/*
+
+ml_models/*
+!ml_models/lr_tfidf_20240727_1.pkl
+!ml_models/vectorizer.pkl
