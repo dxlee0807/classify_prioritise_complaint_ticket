@@ -1,0 +1,13 @@
+pandas
+matplotlib
+seaborn
+nltk
+contractions
+wordninja
+gensim
+scikit-learn
+top2vec
+bertopic
+umap
+hdbscan
+ipywidgets
