@@ -23,7 +23,7 @@ import contractions
 import wordninja
 
 def load_files():
-    # load topic_csv
+    # load ticket_category CSV file
     topic_df = pd.read_csv("ticket_category.csv")
 
     # load tfidf_vectorizer
@@ -31,7 +31,7 @@ def load_files():
         vectorizer = load(f)
 
     # load tuned_lr.pkl
-    with open(os.path.join(os.getcwd(),'ml_models',"lr_20240721_1.pkl"), "rb") as f:
+    with open(os.path.join(os.getcwd(),'ml_models',"lr_tfidf_20240727_1.pkl"), "rb") as f:
         classifier = load(f)
 
     return topic_df, vectorizer, classifier
