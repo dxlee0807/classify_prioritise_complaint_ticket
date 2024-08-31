@@ -44,7 +44,7 @@ To set up the project locally, follow these steps:
 - **Feature Engineering**: Automated generation and labelling of ticket categories and priorities on unlabelled support ticket datasets.
 - **Model Training**: Multiple models (e.g., Logistic Regression, Support Vector Machine, Random Forest, Multinomial Naive Bayes, K-Nearest Neighbors, and Decision Tree) are used to classify and prioritize tickets.
 - **Hyperparameter Tuning**: Model selection techniques such as grid search and random search are used to search the best combination of hyperparameter values for each model.
-- **Deployment**: Supports deploying the models in a real-world ticketing system.
+- **Deployment**: Supports deploying the models in a real-world ticketing system (e.g., https://classify-prioritise-support-ticket.streamlit.app/).
 
 ## Project Structure
 - **ml_models/**: Directory containing saved machine learning models.
