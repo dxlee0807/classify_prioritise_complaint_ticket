@@ -1,8 +1,14 @@
 
-# Complaint Ticket Classification and Prioritization
+# Classifying and Prioritising Tickets for Optimised Customer Support using Natural Language Processing and Machine Learning
 
 ## Introduction
-This project focuses on automating the classification and prioritization of complaint tickets using machine learning models. The goal is to streamline the process of managing customer complaints by categorizing them into appropriate topics and assigning priority levels.
+The project aims to classify and prioritise support tickets to speed up the customer support ticket resolution process, thus guaranteeing customer satisfaction and business revenue.
+
+To achieve the project aim, these objectives should be accomplished:
+1. To generate categories based on the ticket content by applying topic modelling.
+2. To prioritise urgent tickets by conducting a sentiment analysis on the ticket content.
+3. To build support ticket classification models based on categories generated from the first objective using supervised machine learning algorithms.
+4. To assess the support ticket classification models using suitable evaluation metrics.
 
 ## Table of Contents
 - [Installation](#installation)
@@ -12,6 +18,7 @@ This project focuses on automating the classification and prioritization of comp
 - [Dependencies](#dependencies)
 - [Configuration](#configuration)
 - [Examples](#examples)
+- [Dataset](#dataset)
 - [Contributors](#contributors)
 - [License](#license)
 
@@ -34,9 +41,10 @@ To set up the project locally, follow these steps:
 
 ## Features
 - **Data Preprocessing**: Includes data cleaning, exploration, and analysis.
-- **Category Generation**: Automated generation and labeling of ticket categories.
-- **Model Training**: Multiple models (e.g., Logistic Regression, SVM, Random Forest) are used to classify and prioritize tickets.
-- **Deployment**: Support for deploying the models in a real-world ticketing system.
+- **Feature Engineering**: Automated generation and labelling of ticket categories and priorities on unlabelled support ticket datasets.
+- **Model Training**: Multiple models (e.g., Logistic Regression, Support Vector Machine, Random Forest, Multinomial Naive Bayes, K-Nearest Neighbors, and Decision Tree) are used to classify and prioritize tickets.
+- **Hyperparameter Tuning**: Model selection techniques such as grid search and random search are used to search the best combination of hyperparameter values for each model.
+- **Deployment**: Supports deploying the models in a real-world ticketing system.
 
 ## Project Structure
 - **ml_models/**: Directory containing saved machine learning models.
@@ -44,7 +52,7 @@ To set up the project locally, follow these steps:
 - **Scripts**: Python scripts for deploying models and handling ticket data.
 
 ## Dependencies
-- Python 3.x
+- Python 3.8.0
 - Jupyter Notebook
 - Required libraries listed in `requirements.txt`
 
@@ -53,6 +61,9 @@ Adjust model parameters and preprocessing steps in the respective notebooks and 
 
 ## Examples
 Refer to the Jupyter notebooks for detailed examples on how to preprocess data, train models, and evaluate performance.
+
+## Dataset
+The financial complaint dataset is available at https://www.kaggle.com/datasets/venkatasubramanian/automatic-ticket-classification/data
 
 ## Contributors
 - [dxlee0807](https://github.com/dxlee0807)
